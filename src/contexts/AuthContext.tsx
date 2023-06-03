@@ -16,19 +16,11 @@ type SignInData = {
     password: string;
 }
 
-// TIPAGEM DE REGISTRO
-type registerInData = {
-    name: string,
-    email: string;
-    password: string;
-}
-
 type AuthContextType = {
     isAuthenticated: boolean;
     user: User
     getUser: any
     signIn: (data: SignInData) => Promise<void>
-    registerIn: (data: registerInData) => Promise<void>
 }
 
 
@@ -72,30 +64,9 @@ export function AuthProvider({children}) {
         }
     }
 
-    // METODO RESPONSAVEL, POR REGISTRAR UMA CONTA DE USUARIO
-    async function registerIn({name, email, password}: registerInData) {
-        const response  = await axios.post('http://127.0.0.1:8000/api/register', {
-            name, email, password
-        })
-
-        if (response.data.access_token) {
-            Cookies.set('m2_token', response.data.access_token, {
-                expires: 10 / (24 * 60), // TEMPO DE DURACAO DO TOKEN
-            })
-
-            api.defaults.headers['Authorization'] = `Bearer ${response.data.access_token}`
-
-            setUser(response.data.user)
-
-            router.push('/dashboard')
-        }
-
-        return response
-    }
-
     // METODO RESPONSAVEL, POR LOGAR NA SUA CONTA
     async function signIn({email, password}: SignInData) {
-        const response  = await axios.post('http://127.0.0.1:8000/api/login', {
+        const response  = await axios.post('https://m2-server-production.up.railway.app/api/login', {
           email, password
         })
 
@@ -116,7 +87,7 @@ export function AuthProvider({children}) {
 
     return (
 
-        <AuthContext.Provider value={{ user, getUser, isAuthenticated, signIn, registerIn }}>
+        <AuthContext.Provider value={{ user, getUser, isAuthenticated, signIn }}>
             {children}
         </AuthContext.Provider>
     )
